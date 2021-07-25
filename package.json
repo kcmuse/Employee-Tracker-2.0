@@ -1,0 +1,26 @@
+{
+    "name": "employee-tracker-2.0",
+    "version": "1.0.0",
+    "description": "## Your Task",
+    "main": "server.js",
+    "dependencies": {
+        "console.table": "^0.10.0",
+        "inquirer": "^8.1.2",
+        "mysql": "^2.18.1"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "npm test",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kcmuse/Employee-Tracker-2.0.git"
+    },
+    "author": "kcmuse",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kcmuse/Employee-Tracker-2.0/issues"
+    },
+    "homepage": "https://github.com/kcmuse/Employee-Tracker-2.0#readme"
+}
