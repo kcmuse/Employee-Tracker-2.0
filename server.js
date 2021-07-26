@@ -15,26 +15,29 @@ const db = mysql.createConnection({
 
 const runProgram = () => {
     inquirer.prompt({
-            name: 'action',
+            name: ' business',
             type: 'rawlist',
             message: 'What would you like to do?',
             choices: [
-                'View all deparments',
-                'View all roles',
                 'View all employees',
-                'Add department',
-                'Add a role',
                 'Add an employee',
                 'Update employee role',
+                'View all roles',
+                'Add a role',
+                'View all deparments',
+                'Add department'
             ]
         })
         .then(function(answer) {
-            switch (answer.action) {
+            switch (answer.business) {
                 case 'View all departments':
+                    viewDeparments();
                     break;
                 case 'View all roles':
+                    viewAllRoles();
                     break;
                 case 'View all employees':
+                    viewAllEmployees();
                     break;
                 case 'Add department':
                     break;
@@ -48,16 +51,34 @@ const runProgram = () => {
         });
 }
 
+function viewDeparments() {
+    console.log('Showing all departments\n');
+    db.query(`SELECT * FROM department`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        runProgram();
+    });
+}
+
+function viewAllRoles() {
+    console.log(`Showing all roles\n`);
+    db.query(`SELECT * FROM role`), (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        runProgram();
+    }
+}
+
+function viewAllEmployees() {
+    console.log(`Showing all Employees\n`);
+    db.query(`SELECT * FROM employee`), (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        runProgram();
+    }
+}
+
 // GIVEN a command-line application that accepts user input
-// WHEN I start the application
-// THEN I am presented with the following options: 
-// TODO: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-// WHEN I choose to view all departments
-// THEN I am presented with a formatted table showing department names and department ids
-// WHEN I choose to view all roles
-// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
-// WHEN I choose to view all employees
-// THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
 // WHEN I choose to add a department
 // THEN I am prompted to enter the name of the department and that department is added to the database
 // WHEN I choose to add a role
