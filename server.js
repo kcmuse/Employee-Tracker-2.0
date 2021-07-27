@@ -50,7 +50,7 @@ const runProgram = () => {
                     addEmployee();
                     break;
                 case 'Update employee role':
-                    updateEmployee();
+                    updateEmployeeRole();
                     break;
             }
         });
@@ -102,8 +102,7 @@ function addDepartment() {
 };
 
 function addRole() {
-    const db = `SELECT * FROM department`;
-    db.query(query, (err, res) => {
+    db.query(`SELECT * FROM department`, (err, res) => {
         if (err) {
             throw err;
         } else {
@@ -144,8 +143,7 @@ function addRole() {
 };
 
 function addEmployee() {
-    const db = `SELECT * FROM role`;
-    db.query(query, (err, res) => {
+    db.query(`SELECT * FROM role`, (err, res) => {
         if (err) {
             throw err;
         } else {
@@ -183,6 +181,10 @@ function addEmployee() {
             })
         }
     })
+
+}
+
+function updateEmployeeRole() {
 
 }
 
