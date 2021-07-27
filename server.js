@@ -1,10 +1,9 @@
 const inquirer = require(`inquirer`);
 const mysql = require(`mysql`);
-const tables = require(`console.table`);
-const { allowedNodeEnvironmentFlags } = require("process");
 
 const db = mysql.createConnection({
         host: 'localhost',
+        port: 3306,
         user: 'root',
         password: 'password',
         database: 'employees_db'
@@ -12,12 +11,18 @@ const db = mysql.createConnection({
     console.log(`Connected to the employees database.`)
 );
 
-// TODO: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+db.connect(function(err) {
+        if (err) throw err;
+        console.log(`You have been connected!`);
+        runProgram();
 
-const runProgram = () => {
+    })
+    // TODO: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+
+function runProgram() {
     inquirer.prompt({
             name: ' business',
-            type: 'rawlist',
+            type: 'list',
             message: 'Please choose something to do!',
             choices: [
                 'View all employees',
@@ -31,20 +36,8 @@ const runProgram = () => {
         })
         .then(function(answer) {
             switch (answer.business) {
-                case 'View all departments':
-                    viewDeparments();
-                    break;
-                case 'View all roles':
-                    viewAllRoles();
-                    break;
                 case 'View all employees':
                     viewAllEmployees();
-                    break;
-                case 'Add department':
-                    addDepartment();
-                    break;
-                case 'Add a role':
-                    addRole();
                     break;
                 case 'Add an employee':
                     addEmployee();
@@ -52,10 +45,22 @@ const runProgram = () => {
                 case 'Update employee role':
                     updateEmployeeRole();
                     break;
+                case 'View all roles':
+                    viewAllRoles();
+                    break;
+                case 'Add a role':
+                    addRole();
+                    break;
+                case 'View all departments':
+                    viewDeparments();
+                    break;
+                case 'Add department':
+                    addDepartment();
+                    break;
             }
         });
-}
-
+};
+// used to view all departments.
 function viewDeparments() {
     console.log('Showing all departments\n');
     db.query(`SELECT * FROM department`, (err, res) => {
@@ -63,26 +68,27 @@ function viewDeparments() {
         console.table(res);
         runProgram();
     });
-}
-
+};
+// used to see all roles
 function viewAllRoles() {
     console.log(`Showing all roles\n`);
-    db.query(`SELECT * FROM role`), (err, res) => {
+    db.query(`SELECT * FROM role`, (err, res) => {
         if (err) throw err;
         console.table(res);
         runProgram();
-    }
+    })
 }
-
+// used to see all employees
 function viewAllEmployees() {
     console.log(`Showing all Employees\n`);
-    db.query(`SELECT * FROM employee`), (err, res) => {
+    db.query(`SELECT * FROM employee`, (err, res) => {
         if (err) throw err;
         console.table(res);
         runProgram();
-    }
+    })
 }
 
+// function to add a new department
 function addDepartment() {
     inquirer.prompt({
         name: 'departName',
@@ -91,104 +97,109 @@ function addDepartment() {
     }).then((answer) => {
         db.query(`INSERT INTO department (name) VALUES ('${answer.departName}')`,
             (err, res) => {
-                if (err) {
-                    throw err;
-                } else {
-                    console.log('Congratulations your new department has been added!');
-                    runProgram();
-                }
-            });
+                if (err) throw err;
+                console.log('Congratulations your new department has been added!');
+                runProgram();
+            }
+        );
     })
 };
-
+// function to add new role
 function addRole() {
     db.query(`SELECT * FROM department`, (err, res) => {
-        if (err) {
-            throw err;
-        } else {
-            inquirer.prompt([{
-                    name: 'title',
-                    type: 'input',
-                    message: 'Please enter name for new role...'
-                },
-                {
-                    name: `salary`,
-                    type: `number`,
-                    message: `Please enter salary for new role..."i.e. 60000"`
-                },
-                {
-                    name: `department_id`,
-                    type: `list`,
-                    message: `What department is this new role under?`,
-                    choices: res.map(choice => choice.name)
-                }
+        if (err) throw err;
+        inquirer.prompt([{
+                name: 'title',
+                type: 'input',
+                message: 'Please enter name for new role...'
+            },
+            {
+                name: `salary`,
+                type: `number`,
+                message: `Please enter salary for new role..."i.e. 60000"`
+            },
+            {
+                name: `department_id`,
+                type: `list`,
+                message: `What department is this new role under?`,
+                choices: res.map(choice => choice.name)
+            }
 
-            ]).then((answer) => {
-                db.query(`INSERT INTO role (title, salary, department_id) 
+        ]).then((answer) => {
+            db.query(`INSERT INTO role (title, salary, department_id) 
                 VALUES (
                  '${answer.title}',
                  '${answer.salary}',
                  (SELECT id FROM department WHERE name = '${answer.department_id}'));`,
-                    (err, res) => {
-                        if (err) {
-                            throw err;
-                        } else {
-                            console.log('Congratulations your new role as been added!');
-                            runProgram();
-                        }
-                    });
-            })
-        }
+                (err, res) => {
+                    if (err) throw err;
+                    console.log('Congratulations your new role as been added!');
+                    runProgram();
+                });
+        })
     })
 };
-
+// function to add a new employee
 function addEmployee() {
     db.query(`SELECT * FROM role`, (err, res) => {
-        if (err) {
-            throw err;
-        } else {
-            inquirer.prompt([{
-                    name: 'firstName',
-                    type: 'input',
-                    message: 'Please enter a first name for new employee...'
-                },
-                {
-                    name: 'lastName',
-                    type: 'input',
-                    message: 'Please enter a last name for new employee...'
-                },
-                {
-                    name: `role`,
-                    type: `list`,
-                    message: `What is the role of the new employee?`,
-                    choices: res.map(choice => choice.title)
-                }
+        if (err) throw err;
+        inquirer.prompt([{
+                name: 'firstName',
+                type: 'input',
+                message: 'Please enter a first name for new employee...'
+            },
+            {
+                name: 'lastName',
+                type: 'input',
+                message: 'Please enter a last name for new employee...'
+            },
+            {
+                name: `role`,
+                type: `list`,
+                message: `What is the role of the new employee?`,
+                choices: res.map(choice => choice.title)
+            }
 
-            ]).then((answer) => {
-                db.query(`INSERT INTO employee (first_name, last_name, role_id) 
+        ]).then((answer) => {
+            db.query(`INSERT INTO employee (first_name, last_name, role_id) 
                 VALUES (
                  '${answer.firstName}',
                  '${answer.lastName}',
                  (SELECT id FROM role WHERE title = '${answer.role}'));`,
-                    (err, res) => {
-                        if (err) {
-                            throw err;
-                        } else {
-                            console.log('Congratulations your new employee as been added!');
-                            runProgram();
-                        }
-                    });
-            })
-        }
+                (err, res) => {
+                    if (err) throw err;
+                    console.log('Congratulations your new employee as been added!');
+                    runProgram();
+                });
+        })
     })
 
 }
-
+// Function to update the employee role
 function updateEmployeeRole() {
-
-}
-
-
-// GIVEN a command-line application that accepts user input
-// WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update and their new role and this information is updated in the database
+    db.query(`SELECT CONCAT(first_name, " ", last_name) AS full_name FROM employee`, (emperr, empres) => {
+        if (emperr) throw emperr;
+        db.query(`SELECT title FROM role`, (rolerr, rolres) => {
+            if (rolerr) throw rolerr;
+            inquirer.prompt([{
+                    name: 'employee_id',
+                    type: 'list',
+                    message: 'Which employee would you edit?',
+                    choices: employeeRes.map(employee => employee.full_name)
+                },
+                {
+                    name: `newRole`,
+                    type: `list`,
+                    message: `Please choose a new role...`,
+                    choice: rolres.map(role => role.title)
+                }
+            ]).then((answer) => {
+                db.query(`UPDATE employee SET role_id = ? WHERE id = ?`, [answer.newRole, answer.employee_id], function(err) {
+                    if (err) throw err;
+                    console.log("Employee Role has been updated");
+                    runProgram();
+                })
+            })
+        })
+    })
+};
