@@ -40,6 +40,7 @@ const runProgram = () => {
                     viewAllEmployees();
                     break;
                 case 'Add department':
+                    addDepartment();
                     break;
                 case 'Add a role':
                     break;
@@ -76,6 +77,24 @@ function viewAllEmployees() {
         console.table(res);
         runProgram();
     }
+}
+
+function addDepartment() {
+    inquirer.prompt({
+        name: 'departName',
+        type: 'input',
+        message: 'Enter a name for the department?'
+    }).then((answer) => {
+        connection.query(`INSERT INTO department (name) VALUES ('${answer.departName}')`,
+            (err, res) => {
+                if (err) {
+                    throw err;
+                } else {
+                    console.log('Department has been added');
+                    runProgram();
+                }
+            });
+    })
 }
 
 // GIVEN a command-line application that accepts user input
