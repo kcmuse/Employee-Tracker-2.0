@@ -50,6 +50,7 @@ const runProgram = () => {
                     addEmployee();
                     break;
                 case 'Update employee role':
+                    updateEmployee();
                     break;
             }
         });
@@ -142,9 +143,50 @@ function addRole() {
     })
 };
 
+function addEmployee() {
+    const db = `SELECT * FROM role`;
+    db.query(query, (err, res) => {
+        if (err) {
+            throw err;
+        } else {
+            inquirer.prompt([{
+                    name: 'firstName',
+                    type: 'input',
+                    message: 'Please enter a first name for new employee...'
+                },
+                {
+                    name: 'lastName',
+                    type: 'input',
+                    message: 'Please enter a last name for new employee...'
+                },
+                {
+                    name: `role`,
+                    type: `list`,
+                    message: `What is the role of the new employee?`,
+                    choices: res.map(choice => choice.title)
+                }
+
+            ]).then((answer) => {
+                db.query(`INSERT INTO employee (first_name, last_name, role_id) 
+                VALUES (
+                 '${answer.firstName}',
+                 '${answer.lastName}',
+                 (SELECT id FROM role WHERE title = '${answer.role}'));`,
+                    (err, res) => {
+                        if (err) {
+                            throw err;
+                        } else {
+                            console.log('Congratulations your new employee as been added!');
+                            runProgram();
+                        }
+                    });
+            })
+        }
+    })
+
+}
+
 
 // GIVEN a command-line application that accepts user input
-// WHEN I choose to add an employee
-// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
