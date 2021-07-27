@@ -1,6 +1,7 @@
 const inquirer = require(`inquirer`);
 const mysql = require(`mysql`);
 const tables = require(`console.table`);
+const { allowedNodeEnvironmentFlags } = require("process");
 
 const db = mysql.createConnection({
         host: 'localhost',
@@ -17,13 +18,13 @@ const runProgram = () => {
     inquirer.prompt({
             name: ' business',
             type: 'rawlist',
-            message: 'What would you like to do?',
+            message: 'Please choose something to do!',
             choices: [
                 'View all employees',
                 'Add an employee',
                 'Update employee role',
                 'View all roles',
-                'Add a role',
+                'Add a new role',
                 'View all deparments',
                 'Add department'
             ]
@@ -43,8 +44,10 @@ const runProgram = () => {
                     addDepartment();
                     break;
                 case 'Add a role':
+                    addRole();
                     break;
                 case 'Add an employee':
+                    addEmployee();
                     break;
                 case 'Update employee role':
                     break;
@@ -85,23 +88,62 @@ function addDepartment() {
         type: 'input',
         message: 'Enter a name for the department?'
     }).then((answer) => {
-        connection.query(`INSERT INTO department (name) VALUES ('${answer.departName}')`,
+        db.query(`INSERT INTO department (name) VALUES ('${answer.departName}')`,
             (err, res) => {
                 if (err) {
                     throw err;
                 } else {
-                    console.log('Department has been added');
+                    console.log('Congratulations your new department has been added!');
                     runProgram();
                 }
             });
     })
-}
+};
+
+function addRole() {
+    const db = `SELECT * FROM department`;
+    db.query(query, (err, res) => {
+        if (err) {
+            throw err;
+        } else {
+            inquirer.prompt([{
+                    name: 'title',
+                    type: 'input',
+                    message: 'Please enter name for new role...'
+                },
+                {
+                    name: `salary`,
+                    type: `number`,
+                    message: `Please enter salary for new role..."i.e. 60000"`
+                },
+                {
+                    name: `department_id`,
+                    type: `list`,
+                    message: `What department is this new role under?`,
+                    choices: res.map(choice => choice.name)
+                }
+
+            ]).then((answer) => {
+                db.query(`INSERT INTO role (title, salary, department_id) 
+                VALUES (
+                 '${answer.title}',
+                 '${answer.salary}',
+                 (SELECT id FROM department WHERE name = '${answer.department_id}'));`,
+                    (err, res) => {
+                        if (err) {
+                            throw err;
+                        } else {
+                            console.log('Congratulations your new role as been added!');
+                            runProgram();
+                        }
+                    });
+            })
+        }
+    })
+};
+
 
 // GIVEN a command-line application that accepts user input
-// WHEN I choose to add a department
-// THEN I am prompted to enter the name of the department and that department is added to the database
-// WHEN I choose to add a role
-// THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 // WHEN I choose to update an employee role
