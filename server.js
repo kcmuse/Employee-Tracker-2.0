@@ -24,7 +24,6 @@ const runProgram = () => {
             choices: [
                 'View all employees',
                 'Add an employee',
-                // 'Update employee role',
                 'View all roles',
                 'Add a new role',
                 'View all departments',
@@ -39,10 +38,6 @@ const runProgram = () => {
 
                 case 'Add an employee':
                     addEmployee();
-                    break;
-
-                case 'Update employee role':
-                    updateEmployeeRole();
                     break;
 
                 case 'View all roles':
@@ -188,32 +183,3 @@ function addEmployee() {
     })
 
 }
-
-// Function to update the employee role
-// function updateEmployeeRole() {
-//     db.query(`SELECT first_name AS role_id FROM employee`, (emperr, empres) => {
-//         if (emperr) throw emperr;
-//         db.query(`SELECT title AS id FROM role`, (roleErr, roleRes) => {
-//             if (roleErr) throw roleErr;
-//             inquirer.prompt([{
-//                     name: 'employee_id',
-//                     type: 'list',
-//                     message: 'Which employee would you like to edit?',
-//                     choices: empres.map(employee => employee.role_id)
-//                 },
-//                 {
-//                     name: `newRole`,
-//                     type: `list`,
-//                     message: `Please choose a new role...`,
-//                     choices: roleRes.map(role => role.id)
-//                 }
-//             ]).then((answer) => {
-//                 db.query(`UPDATE employee SET role_id = ? WHERE id = ?`, [answer.newRole, answer.employee_id], (err) => {
-//                     if (err) throw err;
-//                     console.log("Employee Role has been updated");
-//                     runProgram();
-//                 })
-//             })
-//         })
-//     })
-// };
