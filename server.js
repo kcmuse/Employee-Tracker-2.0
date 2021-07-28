@@ -12,12 +12,10 @@ const db = mysql.createConnection({
 );
 
 db.connect((err) => {
-        if (err) throw err;
-        console.log(`You have been connected!`);
-        runProgram();
-    })
-    // TODO: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-
+    if (err) throw err;
+    console.log(`You have been connected!`);
+    runProgram();
+})
 const runProgram = () => {
     inquirer.prompt({
             name: 'business',
